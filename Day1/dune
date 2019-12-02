@@ -1,6 +1,6 @@
 (executable
  (public_name Day1)
- (name main)
+ (name Day1)
  (libraries Commons)
  (preprocess
   (pps ppx_inline_test)))
