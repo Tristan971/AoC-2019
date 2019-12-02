@@ -17,9 +17,9 @@
             "dependsOn":["Build commons"]
         },
         {
-            "label": "Build commons",
+            "label": "Build",
             "type": "shell",
-            "command": "ocamlopt -c IOUtils.ml",
+            "command": "dune build ${workspaceFolder}",
             "problemMatcher": [
                 "$ocamlc"
             ],

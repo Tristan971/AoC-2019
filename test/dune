@@ -1,0 +1,4 @@
+(test
+ (name AoC_2019)
+ (preprocess
+  (pps ppx_inline_test)))

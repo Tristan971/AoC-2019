@@ -1,2 +1,5 @@
 (library
-    (name Commons))
+ (inline_tests)
+ (name Commons)
+ (preprocess
+  (pps ppx_inline_test)))
