@@ -13,6 +13,19 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
+            },
+            "dependsOn":["Build commons"]
+        },
+        {
+            "label": "Build commons",
+            "type": "shell",
+            "command": "ocamlopt -c IOUtils.ml",
+            "problemMatcher": [
+                "$ocamlc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
             }
         }
     ]

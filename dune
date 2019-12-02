@@ -1,0 +1,3 @@
+(executable
+    (name Day1)
+    (libraries Commons))
