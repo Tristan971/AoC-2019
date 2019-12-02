@@ -6,27 +6,21 @@
         {
             "label": "Run",
             "type": "shell",
-            "command": "ocaml ${file}",
-            "problemMatcher": [
-                "$ocamlc"
-            ],
+            "command": "dune exec ${relativeFileDirname}",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "dependsOn":["Build commons"]
+            "dependsOn": [
+                "Build"
+            ],
+            "problemMatcher": []
         },
         {
             "label": "Build",
             "type": "shell",
-            "command": "dune build ${workspaceFolder}",
-            "problemMatcher": [
-                "$ocamlc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            "command": "dune build",
+            "group": "none"
         }
     ]
 }
