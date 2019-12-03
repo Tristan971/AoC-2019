@@ -1,40 +1,41 @@
-let execute_in_place_array_op(in1: int)(in2: int)(res: int)(op: (int -> int -> int))(arr: int array): (int array) = 
-  Array.set arr res (op in1 in2);
-  arr
+let print_int_array(arr: (int array)): unit =
+  let len = Array.length arr in
+  let len_m1 = len - 1 in
+  if Array.length arr == 0 then
+    print_string "[]\n"
+  else
+    let print_i(index: int)(elem: int): unit =
+      let postfix = match (len_m1 - index) with 
+        | 0 -> ""
+        | _ -> ", "
+      in Printf.printf("%d%s") elem postfix
+    in
+    print_string "[";
+    Array.iteri (fun i e -> print_i i e) arr;
+    print_string "]\n"
 
-let add(in1: int)(in2: int)(res: int)(code: int array): (int array) = 
-  execute_in_place_array_op in1 in2 res (fun a b -> a + b) code
-
-let mul(in1: int)(in2: int)(res: int)(code: int array): (int array) = 
-  execute_in_place_array_op in1 in2 res (fun a b -> a * b) code
-
-type operation_params =
-{
-  in1: int;
-  in2: int;
-  res: int;
-}
+let execop(position: int) (opcode: int) (code: (int array)): (int array) =
+  let opint: (int -> int -> int) = if opcode == 1 then (fun a b -> a + b) else (fun a b -> a * b) in
+  let in1 = Array.get code (position + 1) in
+  let in1_val = Array.get code in1 in
+  let in2 = Array.get code (position + 2) in
+  let in2_val = Array.get code in2 in
+  let out = Array.get code (position + 3) in
+  Printf.printf("Executing at %d (opcode: %d, in1: %d -> %d, in2: %d -> %d, out: %d)\n") position opcode in1 in1_val in2 in2_val out;
+  Array.set code out (opint in1_val in2_val);
+  code
 
 let rec exec(position: int) (code: (int array)): (int array) =
-  let opcode = Array.get code position in
+  Printf.printf "-- Executing on:\n";
+  print_int_array code;
 
-  let exec_operation(opcode: int) (position: int) (code: (int array)): (int array) =
-    let in1 = Array.get code (position + 1) in
-    let in2 = Array.get code (position + 2) in
-    let res = Array.get code (position + 3) in
-    match opcode with
-        | 1 -> exec (position + 4) (add in1 in2 res code)
-        | 2 -> exec (position + 4) (mul in1 in2 res code)
-        | _ -> failwith("Wtf, got opcode: " ^ string_of_int opcode)
-  in
-  
+  let opcode = Array.get code position in
   match opcode with
-    | 99 -> code
-    | 1 | 2 -> exec_operation opcode position code
-    | __ -> failwith ("Invalid code: " ^ (string_of_int opcode))
+   | 99 -> Printf.printf("Got 99, exiting.\n");code
+   | 1 | 2 -> exec (position + 4) (execop position opcode code)
+   | _ -> failwith ("Invalid opcode " ^ (string_of_int opcode))
 
 let () =
   let result = exec 0 (Array.of_list [1;0;0;0;99]) in
-  Printf.printf("[");
-  List.iter (fun elem -> Printf.printf "%s, " (string_of_int elem)) (Array.to_list result);
-  Printf.printf("]");
+  Printf.printf "-- Result:\n";
+  print_int_array result
