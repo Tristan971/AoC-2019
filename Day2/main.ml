@@ -1,4 +1,6 @@
-let print_int_array(arr: (int array)): unit =
+open Commons
+
+let print_int_array(arr: (int array))(from: (int)): unit =
   let len = Array.length arr in
   let len_m1 = len - 1 in
   if Array.length arr == 0 then
@@ -11,7 +13,7 @@ let print_int_array(arr: (int array)): unit =
       in Printf.printf("%d%s") elem postfix
     in
     print_string "[";
-    Array.iteri (fun i e -> print_i i e) arr;
+    Array.iteri (fun i e -> if i >= from then print_i i e) arr;
     print_string "]\n"
 
 let execop(position: int) (opcode: int) (code: (int array)): (int array) =
@@ -26,8 +28,8 @@ let execop(position: int) (opcode: int) (code: (int array)): (int array) =
   code
 
 let rec exec(position: int) (code: (int array)): (int array) =
-  Printf.printf "-- Executing on:\n";
-  print_int_array code;
+  Printf.printf "\n-- Executing on:\n";
+  print_int_array code position;
 
   let opcode = Array.get code position in
   match opcode with
@@ -35,7 +37,25 @@ let rec exec(position: int) (code: (int array)): (int array) =
    | 1 | 2 -> exec (position + 4) (execop position opcode code)
    | _ -> failwith ("Invalid opcode " ^ (string_of_int opcode))
 
+
+let exec_for(input: string) =
+  let input_split = String.split_on_char ',' input in
+  let input_ints = List.map int_of_string input_split in
+  let result = exec 0 (Array.of_list input_ints) in
+  Printf.printf "\n-- Result:\n";
+  print_int_array result 0;
+  Array.to_list result
+
+let samples(): unit = 
+  let _ = exec_for("1,0,0,0,99") in
+  let _ = exec_for("2,3,0,3,99") in
+  let _ = exec_for("2,4,4,5,99,0") in
+  let _ = exec_for("1,1,1,4,99,5,6,0,99") in
+  print_string "Done running samples\n"
+
 let () =
-  let result = exec 0 (Array.of_list [1;0;0;0;99]) in
-  Printf.printf "-- Result:\n";
-  print_int_array result
+  let input = IOUtils.read_all_lines "./Day2/input" in
+  let _ = match input with
+    | h::_ -> exec_for(h)
+    | _ -> failwith("Bad input!\n" ^ List.hd input)
+  in print_string "Done\n"
