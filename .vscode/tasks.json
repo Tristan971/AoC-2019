@@ -6,7 +6,7 @@
         {
             "label": "Run",
             "type": "shell",
-            "command": "dune exec ${relativeFileDirname}",
+            "command": "time dune exec ${relativeFileDirname}",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -19,7 +19,7 @@
         {
             "label": "Build",
             "type": "shell",
-            "command": "dune build",
+            "command": "time dune build",
             "group": "none"
         }
     ]
