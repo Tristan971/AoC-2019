@@ -92,9 +92,11 @@ let part2(): unit =
   let input = read_input() in
   
   let next(params: noun_verb): noun_verb = 
-    if params.noun == 99 then { noun= 0; verb=(params.verb + 1) }
-    else if params.verb <= 99 then { noun = 0; verb = (params.verb + 1) }
-    else  failwith("No next after noun at " ^ string_of_int params.noun ^ " and verb at " ^ string_of_int params.verb)
+    let next_params =
+      if params.noun < 99 then { noun = (params.noun + 1); verb = params.verb }
+      else if params.verb < 99 then { noun = 0; verb = (params.verb + 1) }
+      else  failwith("No next after noun at " ^ string_of_int params.noun ^ " and verb at " ^ string_of_int params.verb)
+    in Printf.printf "-> Next params: { %d, %d }\n" next_params.noun next_params.verb; next_params
   in
 
   let rec search_em(params: noun_verb) =
