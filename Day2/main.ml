@@ -114,4 +114,4 @@ let part2(): unit =
 let () =
   part1();
   part2();
-  print_string "Over and out.\n"
+  print_string "Over and out.\n\n"
