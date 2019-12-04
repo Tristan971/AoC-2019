@@ -79,6 +79,7 @@ let find_closest_intersection (wire1 : path list) (wire2 : path list) : pos =
   let pos2 = get_visited_positions center wire2 in
 
   let intersections = get_intersections pos1 pos2 in
+  print_endline("Intersections: " ^ (String.concat " " (List.map string_of_pos intersections)));
   get_closest_intersection intersections
 
 let parse_input (wires : string list) : path list list =
@@ -95,8 +96,8 @@ let run_for (input : string list) : unit =
     find_closest_intersection (List.nth wires 0) (List.nth wires 1)
   in
   let dist_of_closes = get_manhattan_distance closest_inters in
-  print_string
-    ( "Closes intersection is "
+  print_endline
+    ( "Closest intersection is "
     ^ string_of_pos closest_inters
     ^ " with distance "
     ^ string_of_int dist_of_closes
@@ -117,4 +118,4 @@ let part1(): unit =
   run_for input
 
 let () =
-  part1()
+  samples()
