@@ -48,16 +48,23 @@ let get_visited_positions (start : pos) (paths : path list) : pos list =
   in
   travel start paths []
 
-let get_intersections (positions1 : pos list) (positions2 : pos list) =
-  let contains (l : pos list) (position : pos) : bool =
-    Option.is_some (List.find_opt (fun posi -> posi = position) l)
-  in
-  List.filter (fun pos1 -> contains positions2 pos1) positions1
-
 let get_manhattan_distance (position : pos) : int =
   let deltaX = abs position.x in
   let deltaY = abs position.y in
   deltaX + deltaY
+
+let compare_pos (pos1 : pos) (pos2 : pos) : int =
+  Int.compare (get_manhattan_distance pos1) (get_manhattan_distance pos2)
+
+module PosSet = Set.Make (struct
+  type t = pos
+
+  let compare = compare_pos
+end)
+
+let get_intersections (positions1 : pos list) (positions2 : pos list) =
+  let intersections = PosSet.of_list (positions1 @ positions2) in
+  List.of_seq (PosSet.to_seq intersections)
 
 let get_closest_intersection (intersections : pos list) : pos =
   let compare_by_manhattan_distance (pos1 : pos) (pos2 : pos) =
@@ -76,10 +83,15 @@ let parse_path (path_str : string) : path =
 let find_closest_intersection (wire1 : path list) (wire2 : path list) : pos =
   let center : pos = { x = 0; y = 0 } in
   let pos1 = get_visited_positions center wire1 in
+  print_endline
+    ("Wire 1 had: " ^ string_of_int (List.length pos1) ^ " positions.");
   let pos2 = get_visited_positions center wire2 in
+  print_endline
+    ("Wire 2 had: " ^ string_of_int (List.length pos2) ^ " positions.");
 
   let intersections = get_intersections pos1 pos2 in
-  print_endline("Intersections: " ^ (String.concat " " (List.map string_of_pos intersections)));
+  print_endline
+    ("Intersections count: " ^ string_of_int (List.length intersections));
   get_closest_intersection intersections
 
 let parse_input (wires : string list) : path list list =
@@ -113,9 +125,8 @@ let samples () : unit =
       "U98,R91,D20,R16,D67,R40,U7,R15,U6,R7";
     ]
 
-let part1(): unit =
+let part1 () : unit =
   let input = IOUtils.read_all_lines "./Day3/input" in
   run_for input
 
-let () =
-  samples()
+let () = part1 ()
