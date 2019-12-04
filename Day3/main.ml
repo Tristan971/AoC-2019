@@ -154,8 +154,6 @@ let samples () : unit =
       "U98,R91,D20,R16,D67,R40,U7,R15,U6,R7";
     ]
 
-let part1 () : unit =
+let () = 
   let input = IOUtils.read_all_lines "./Day3/input" in
   run_for input
-
-let () = part1 ()
