@@ -54,17 +54,20 @@ let get_manhattan_distance (position : pos) : int =
   deltaX + deltaY
 
 let compare_pos (pos1 : pos) (pos2 : pos) : int =
-  Int.compare (get_manhattan_distance pos1) (get_manhattan_distance pos2)
+  let modulus(pos: pos): float = sqrt((float_of_int pos.x) ** 2. +. (float_of_int pos.y) ** 2.)
+  in Float.compare (modulus pos1) (modulus pos2)
 
-module PosSet = Set.Make (struct
-  type t = pos
+module SS = Set.Make (String)
 
-  let compare = compare_pos
-end)
-
-let get_intersections (positions1 : pos list) (positions2 : pos list) =
-  let intersections = PosSet.of_list (positions1 @ positions2) in
-  List.of_seq (PosSet.to_seq intersections)
+let get_intersections (positions1 : pos list) (positions2 : pos list): (pos list) =
+  let pos_to_str(pos: pos) = (string_of_int pos.x) ^ "|" ^ (string_of_int pos.y) in
+  let pos_from_str(str: string) = let split = String.split_on_char '|' str in { x=(int_of_string (List.nth split 0)); y=(int_of_string (List.nth split 1))} in
+  let inter_1 = SS.of_list (List.map pos_to_str positions1) in
+  let inter_2 = SS.of_list (List.map pos_to_str positions2) in
+  let inter = SS.inter inter_1 inter_2 in
+  print_endline ("Intersections set cardinal: " ^ (string_of_int (SS.cardinal inter)));
+  let inter_list = SS.elements inter in
+  List.map pos_from_str inter_list
 
 let get_closest_intersection (intersections : pos list) : pos =
   let compare_by_manhattan_distance (pos1 : pos) (pos2 : pos) =
@@ -129,4 +132,4 @@ let part1 () : unit =
   let input = IOUtils.read_all_lines "./Day3/input" in
   run_for input
 
-let () = part1 ()
+let () = part1()
