@@ -53,10 +53,6 @@ let get_manhattan_distance (position : pos) : int =
   let deltaY = abs position.y in
   deltaX + deltaY
 
-let compare_pos (pos1 : pos) (pos2 : pos) : int =
-  let modulus(pos: pos): float = sqrt((float_of_int pos.x) ** 2. +. (float_of_int pos.y) ** 2.)
-  in Float.compare (modulus pos1) (modulus pos2)
-
 module SS = Set.Make (String)
 
 let get_intersections (positions1 : pos list) (positions2 : pos list): (pos list) =
