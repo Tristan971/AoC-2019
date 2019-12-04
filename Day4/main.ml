@@ -14,9 +14,8 @@ let has_dupe (digits : char list) : bool =
   is_duped_with_next digits
 
 let has_dupe_strictly_2 (digits : char list) : bool =
-  let rec find_2_strict (remaining : char list) (previous : char) (count : int)
-      : bool =
-    match remaining with
+  let rec find_2_strict (rem : char list) (previous : char) (count : int) =
+    match rem with
     | [] -> count == 2
     | a :: t when a != previous ->
         if count == 2 then true else find_2_strict t a 1
@@ -24,8 +23,6 @@ let has_dupe_strictly_2 (digits : char list) : bool =
     | _ -> failwith "Unexpected"
   in
   find_2_strict digits 'x' 0
-
-(* use impossible prev to not match on first *)
 
 let is_valid_p1 (n : int) : bool =
   let digits = List.of_seq (String.to_seq (string_of_int n)) in
@@ -47,15 +44,11 @@ let count_in_range (low : int) (high : int) (validator : int -> bool) : unit =
 
 let assert_validity_p2 (n : int) (expect : bool) : unit =
   if is_valid_p2 n != expect then
-    failwith
-      ( "Expected validity of " ^ string_of_int n ^ " to be "
-      ^ string_of_bool expect ^ " but was "
-      ^ string_of_bool (not expect) )
+    Printf.printf "Expected %d to have validity %s !" n (string_of_bool expect)
 
 let samples_2 () =
   assert_validity_p2 112233 true;
   assert_validity_p2 111122 true;
-
   assert_validity_p2 221111 false;
   assert_validity_p2 123444 false;
   assert_validity_p2 666669 false;
@@ -65,5 +58,3 @@ let () =
   samples_2 ();
   count_in_range 147981 691423 is_valid_p1;
   count_in_range 147981 691423 is_valid_p2
-
-(* print_endline "Done!" *)
