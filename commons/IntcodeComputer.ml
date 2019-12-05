@@ -13,7 +13,7 @@ let execution_add (arr: int array) (params_l: (int * int) list) : int =
   let params_a = Array.of_list params_l in
   let (m1, i1) = Array.get params_a 0 in
   let (m2, i2) = Array.get params_a 1 in
-  let (_, io) = Array.get params_a 0 in
+  let (_, io) = Array.get params_a 2 in
   let input1 = if m1 == 0 then Array.get arr i1 else i1 in
   let input2 = if m2 == 0 then Array.get arr i2 else i2 in
   let output = io in
@@ -29,10 +29,13 @@ let execution_mul (arr: int array) (params_l: (int * int) list) : int =
   let params_a = Array.of_list params_l in
   let (m1, i1) = Array.get params_a 0 in
   let (m2, i2) = Array.get params_a 1 in
-  let (_, io) = Array.get params_a 0 in
+  let (_, io) = Array.get params_a 2 in
   let input1 = if m1 == 0 then Array.get arr i1 else i1 in
   let input2 = if m2 == 0 then Array.get arr i2 else i2 in
   let output = io in
+  print_string "Arr is now: ";
+  Basics.print_int_array arr 0;
+  Printf.printf "%d * %d -> %d\n" input1 input2 output;
   Array.set arr output (input1 * input2);
   4
 
@@ -87,7 +90,7 @@ type execution = {
 
 (* due to recursive parsing, param 0 will have index 0, and this is meant to be read left-to-right *)
 let read_params(arr: int array) (from: int) (to_i: int): int list =
-  Printf.printf "Reading params from %d to %d (excl.)\n" from to_i;
+  Printf.printf "Reading params %d-%d\n" from (to_i - 1);
   let rec read (i: int) (read_p: int list): int list =
     match i with
     | _ when i == to_i -> read_p
@@ -99,7 +102,7 @@ let _read_execution_simple (arr: int array) (position: int) : execution =
   let instruction = instruction_of_opcode opcode in
   let params_start_pos = position + 1 in
   let params = read_params arr params_start_pos (params_start_pos + instruction.param_count) in
-  let params_and_mode = List.map (fun p -> (p, 0)) params in
+  let params_and_mode = List.map (fun p -> (0, p)) params in
   {
     array = arr;
     position = position;
@@ -116,7 +119,7 @@ let _read_execution_with_modes (arr: int array) (position: int) : execution =
   let params_start_pos = position + 1 in
   let params = read_params arr params_start_pos (params_start_pos + instruction.param_count) in
   let params_modes = List.map (fun c -> int_of_string (Char.escaped c)) (List.of_seq (String.to_seq param_modes_str)) in
-  let params_and_mode = List.combine params params_modes in
+  let params_and_mode = List.combine params_modes params in
   {
     array = arr;
     position = position;
@@ -125,8 +128,10 @@ let _read_execution_with_modes (arr: int array) (position: int) : execution =
   }
 
 let read_execution (arr: int array) (position: int) : execution =
+  Printf.printf "Reading execution starting @ %d\n" position;
   let opcode = Array.get arr position in
   match opcode with
+    | 99 -> { array = arr; position = position; instruction = instruction_halt; params_and_mode = [] }
     | _ when opcode < 100 -> _read_execution_simple arr position
     | _ -> _read_execution_with_modes arr position
 
