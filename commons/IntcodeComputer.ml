@@ -86,16 +86,18 @@ type execution = {
 
 (* due to recursive parsing, param 0 will have index 0, and this is meant to be read left-to-right *)
 let read_params(arr: int array) (from: int) (to_i: int): int list =
+  Printf.printf "Reading params from %d to %d (excl.)\n" from to_i;
   let rec read (i: int) (read_p: int list): int list =
     match i with
-    | _ when i == (to_i - 1) -> read_p
+    | _ when i == to_i -> read_p
     | _ -> read (i + 1) ((Array.get arr i)::read_p)
   in read from []
 
 let _read_execution_simple (arr: int array) (position: int) : execution =
   let opcode = Array.get arr position in
   let instruction = instruction_of_opcode opcode in
-  let params = read_params arr (position + 1) instruction.param_count in
+  let params_start_pos = position + 1 in
+  let params = read_params arr params_start_pos (params_start_pos + instruction.param_count) in
   let params_and_mode = List.map (fun p -> (p, 0)) params in
   {
     array = arr;
@@ -132,7 +134,7 @@ let read_execution (arr: int array) (position: int) : execution =
 
 let apply_execution_and_get_next_position(e: execution): int =
   Printf.printf "Executing @ %d with %d and params: [ " e.position e.instruction.opcode;
-  List.iter (fun (i1, i2) -> Printf.printf "%d|%d" i1 i2) e.params_and_mode;
+  List.iter (fun (i1, i2) -> Printf.printf " %d|%d " i1 i2) e.params_and_mode;
   Printf.printf " ]\n";
   match e.instruction.opcode with
   | 0 -> failwith "Cannot execute a halt!!!"
@@ -150,4 +152,4 @@ let execute(arr: int array): int array =
     | __ -> execute_from (apply_execution_and_get_next_position execution)
   in execute_from 0
 
-let () = print_endline "IntCode computer primitives"
+let () = print_endline "Loaded IntCode virtual machine"
