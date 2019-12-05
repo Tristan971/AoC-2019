@@ -70,6 +70,7 @@ let instruction_of_opcode(opcode: int): instruction =
   | 2 -> instruction_mul
   | 3 -> instruction_input
   | 4 -> instruction_print
+  | 99 -> instruction_halt
   | _ -> failwith("Unknown instruction code: " ^ string_of_int opcode)
 
 (* execution context *)
@@ -145,11 +146,22 @@ let apply_execution_and_get_next_position(e: execution): int =
   | _ -> failwith ("Unknown opcode! " ^ (string_of_int e.instruction.opcode))
 
 let execute(arr: int array): int array =
+  print_string "\n\n-- Starting computer --\n";
+  print_string "| Input array: ";
+  Basics.print_int_array arr 0;
+  Printf.printf "-----------------------\n";
+
   let rec execute_from (position: int): int array =
     let execution = read_execution arr position in
     match execution.instruction with
-    | instruction when instruction == instruction_halt -> arr
+    | instruction when instruction == instruction_halt -> 
+        Printf.printf "Got HALT @ %d\n" position; 
+        print_string "Result: "; Basics.print_int_array arr 0;
+        arr
     | __ -> execute_from (apply_execution_and_get_next_position execution)
-  in execute_from 0
+  in 
+  let result = execute_from 0 
+  in Printf.printf "-- Finished. --\n\n";
+  result
 
 let () = print_endline "Loaded IntCode virtual machine"
