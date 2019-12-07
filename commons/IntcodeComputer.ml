@@ -17,6 +17,9 @@ let execution_add (arr: int array) (params_l: (int * int) list) : int =
   let input1 = if m1 == 0 then Array.get arr i1 else i1 in
   let input2 = if m2 == 0 then Array.get arr i2 else i2 in
   let output = io in
+  print_string "Arr is now: ";
+  Basics.print_int_array arr 0;
+  Printf.printf "%d + %d -> &%d\n" input1 input2 output;
   Array.set arr output (input1 + input2);
   4
 
@@ -35,7 +38,7 @@ let execution_mul (arr: int array) (params_l: (int * int) list) : int =
   let output = io in
   print_string "Arr is now: ";
   Basics.print_int_array arr 0;
-  Printf.printf "%d * %d -> %d\n" input1 input2 output;
+  Printf.printf "%d * %d -> &%d\n" input1 input2 output;
   Array.set arr output (input1 * input2);
   4
 
@@ -112,14 +115,17 @@ let _read_execution_simple (arr: int array) (position: int) : execution =
 
 let _read_execution_with_modes (arr: int array) (position: int) : execution =
   let operation = Array.get arr position in
-  let operation_str = string_of_int operation in
-  let opcode_str = String.sub operation_str (String.length operation_str - 2) (String.length operation_str) in
+  let operation_str: string = Basics.pad (string_of_int operation) 2 '0' in
+  let opcode_from = String.length operation_str - 2 in
+  let opcode_str = String.sub operation_str opcode_from 2 in
+  Printf.printf "Opcode: %s\n" opcode_str;
   let instruction = instruction_of_opcode (int_of_string opcode_str) in
   let param_modes_str_unpadded = String.sub operation_str 0 (String.length operation_str - 2) in
   let param_modes_str = Basics.pad param_modes_str_unpadded instruction.param_count '0' in
+  Printf.printf "Params: %s\n" param_modes_str;
   let params_start_pos = position + 1 in
   let params = read_params arr params_start_pos (params_start_pos + instruction.param_count) in
-  let params_modes = List.map (fun c -> int_of_string (Char.escaped c)) (List.of_seq (String.to_seq param_modes_str)) in
+  let params_modes = List.rev (List.map (fun c -> int_of_string (Char.escaped c)) (List.of_seq (String.to_seq param_modes_str))) in
   let params_and_mode = List.combine params_modes params in
   {
     array = arr;
@@ -140,7 +146,7 @@ let read_execution (arr: int array) (position: int) : execution =
 (* entrypoints *)
 
 let apply_execution_and_get_next_position(e: execution): int =
-  Printf.printf "Executing @ %d with %d and params: [ " e.position e.instruction.opcode;
+  Printf.printf "Executing opcode %d @ %d with %d and params: [ " e.instruction.opcode e.position e.instruction.opcode;
   List.iter (fun (i1, i2) -> Printf.printf " %d|%d " i1 i2) e.params_and_mode;
   Printf.printf " ]\n";
   let move_by: int = match e.instruction.opcode with

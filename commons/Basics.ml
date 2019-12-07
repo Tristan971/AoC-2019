@@ -31,6 +31,7 @@ let combine_arrays (a1: 'a array) (a2: 'b array): ('a * 'b) array =
 (* 1 (length of 1) -> 4-length -> [000]1 *)
 let pad (input: string) (length_wanted: int) (pad_character: char): string = 
   let needed_count = length_wanted - (String.length input) in
+  if needed_count <= 0 then input else
   let rec append (cur: string) (left: int): string =
     match left with
     | 0 -> cur
