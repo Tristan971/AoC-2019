@@ -72,7 +72,7 @@ let part2(): unit =
 
 
 let () =
-  part1();
+  (* part1(); *)
   part2();
   (*samples();*)
   print_string "Over and out.\n\n"
