@@ -5,65 +5,133 @@ type instruction = {
   param_count: int;
 }
 
+type execution = {
+  (* positional *)
+  array: int array;
+  position: int;
+  instruction: instruction;
+
+  (* functional *)
+  params_and_mode: (int * int) list;
+}
+
 let instruction_add: instruction = { 
   opcode = 1; 
   param_count = 3;
 }
-let execution_add (arr: int array) (params_l: (int * int) list) : int =
-  let params_a = Array.of_list params_l in
+let execution_add (e: execution) : int =
+  let params_a = Array.of_list e.params_and_mode in
   let (m1, i1) = Array.get params_a 0 in
   let (m2, i2) = Array.get params_a 1 in
   let (_, io) = Array.get params_a 2 in
-  let input1 = if m1 == 0 then Array.get arr i1 else i1 in
-  let input2 = if m2 == 0 then Array.get arr i2 else i2 in
+  let input1 = if m1 == 0 then Array.get e.array i1 else i1 in
+  let input2 = if m2 == 0 then Array.get e.array i2 else i2 in
   let output = io in
   (* print_string "Arr is now: ";
   Basics.print_int_array arr 0;
   Printf.printf "%d + %d -> &%d\n" input1 input2 output; *)
-  Array.set arr output (input1 + input2);
-  4
+  Array.set e.array output (input1 + input2);
+  e.position + 4
 
 let instruction_mul: instruction = { 
   opcode = 2; 
   param_count = 3;
 }
 
-let execution_mul (arr: int array) (params_l: (int * int) list) : int =
-  let params_a = Array.of_list params_l in
+let execution_mul (e: execution) : int =
+  let params_a = Array.of_list e.params_and_mode in
   let (m1, i1) = Array.get params_a 0 in
   let (m2, i2) = Array.get params_a 1 in
   let (_, io) = Array.get params_a 2 in
-  let input1 = if m1 == 0 then Array.get arr i1 else i1 in
-  let input2 = if m2 == 0 then Array.get arr i2 else i2 in
+  let input1 = if m1 == 0 then Array.get e.array i1 else i1 in
+  let input2 = if m2 == 0 then Array.get e.array i2 else i2 in
   let output = io in
   (* print_string "Arr is now: ";
   Basics.print_int_array arr 0;
   Printf.printf "%d * %d -> &%d\n" input1 input2 output; *)
-  Array.set arr output (input1 * input2);
-  4
+  Array.set e.array output (input1 * input2);
+  e.position + 4
 
 let instruction_input: instruction = {
   opcode = 3;
   param_count = 1;
 }
 
-let execution_input (arr: int array) (params_l: (int * int) list) : int =
-  let (_, output) = List.hd params_l in
+let execution_input (e: execution) : int =
+  let (_, output) = List.hd e.params_and_mode in
   print_string "INPUT REQUEST: ";
   let input = read_int() in
-  Array.set arr output input;
-  2
+  Array.set e.array output input;
+  e.position + 2
 
 let instruction_print: instruction = {
   opcode = 4;
   param_count = 1;
 }
 
-let execution_print (arr: int array) (params_l: (int * int) list): int =
-  let (mi, pi) = List.hd params_l in
-  let input = if mi == 0 then Array.get arr pi else pi in
+let execution_print (e: execution): int =
+  let (mi, pi) = List.hd e.params_and_mode in
+  let input = if mi == 0 then Array.get e.array pi else pi in
   Printf.printf "\n[ OUTPUT ] => %d\n" input;
-  2
+  e.position + 2
+
+let instruction_jmp_if_true: instruction = {
+  opcode = 5;
+  param_count = 2;
+}
+
+let execution_jmp_if_true (e: execution): int =
+  let (mv, v) = List.hd e.params_and_mode in
+  let (mt, t) = List.nth e.params_and_mode 1 in
+  let tested = if mv = 0 then Array.get e.array v else v in
+  let instruction_ptr = if mt = 0 then Array.get e.array t else t in
+  if tested != 0 then instruction_ptr else e.position + 3
+
+let instruction_jmp_if_false: instruction = {
+  opcode = 6;
+  param_count = 2;
+}
+
+let execution_jmp_if_false (e: execution): int =
+  let (mv, v) = List.hd e.params_and_mode in
+  let (mt, t) = List.nth e.params_and_mode 1 in
+  let tested = if mv = 0 then Array.get e.array v else v in
+  let instruction_ptr = if mt = 0 then Array.get e.array t else t in
+  if tested == 0 then instruction_ptr else e.position + 3
+
+let instruction_less_than: instruction = {
+  opcode = 7;
+  param_count = 3;
+}
+
+let execution_less_than (e: execution) : int =
+  let params_a = Array.of_list e.params_and_mode in
+  let (m1, i1) = Array.get params_a 0 in
+  let (m2, i2) = Array.get params_a 1 in
+  let (_, io) = Array.get params_a 2 in
+  let input1 = if m1 == 0 then Array.get e.array i1 else i1 in
+  let input2 = if m2 == 0 then Array.get e.array i2 else i2 in
+  let output = io in
+  let result = if input1 < input2 then 1 else 0 in
+  Array.set e.array output result;
+  e.position + 4
+
+let instruction_equals: instruction = {
+  opcode = 8;
+  param_count = 3;
+}
+
+let execution_equals (e: execution) : int =
+  let params_a = Array.of_list e.params_and_mode in
+  let (m1, i1) = Array.get params_a 0 in
+  let (m2, i2) = Array.get params_a 1 in
+  let (_, io) = Array.get params_a 2 in
+  let input1 = if m1 == 0 then Array.get e.array i1 else i1 in
+  let input2 = if m2 == 0 then Array.get e.array i2 else i2 in
+  let output = io in
+  let result = if input1 == input2 then 1 else 0 in
+  Array.set e.array output result;
+  e.position + 4
 
 let instruction_halt: instruction = {
   opcode = 99;
@@ -77,20 +145,12 @@ let instruction_of_opcode(opcode: int): instruction =
   | 2 -> instruction_mul
   | 3 -> instruction_input
   | 4 -> instruction_print
+  | 5 -> instruction_jmp_if_true
+  | 6 -> instruction_jmp_if_false
+  | 7 -> instruction_less_than
+  | 8 -> instruction_equals
   | 99 -> instruction_halt
   | _ -> failwith("Unknown instruction code: " ^ string_of_int opcode)
-
-(* execution context *)
-
-type execution = {
-  (* positional *)
-  array: int array;
-  position: int;
-  instruction: instruction;
-
-  (* functional *)
-  params_and_mode: (int * int) list;
-}
 
 (* due to recursive parsing, param 0 will have index 0, and this is meant to be read left-to-right *)
 let read_params(arr: int array) (from: int) (to_i: int): int list =
@@ -150,14 +210,18 @@ let apply_execution_and_get_next_position(e: execution): int =
   Printf.printf "Executing opcode %d @ %d with %d and params: [ " e.instruction.opcode e.position e.instruction.opcode;
   List.iter (fun (i1, i2) -> Printf.printf " %d|%d " i1 i2) e.params_and_mode;
   Printf.printf " ]\n";
-  let move_by: int = match e.instruction.opcode with
+  let execution_fun: (execution -> int) = match e.instruction.opcode with
   | 0 -> failwith "Cannot execute a halt!!!"
-  | 1 -> execution_add e.array e.params_and_mode
-  | 2 -> execution_mul e.array e.params_and_mode
-  | 3 -> execution_input e.array e.params_and_mode
-  | 4 -> execution_print e.array e.params_and_mode
+  | 1 -> execution_add
+  | 2 -> execution_mul
+  | 3 -> execution_input
+  | 4 -> execution_print
+  | 5 -> execution_jmp_if_true
+  | 6 -> execution_jmp_if_false
+  | 7 -> execution_less_than
+  | 8 -> execution_equals
   | _ -> failwith ("Unknown opcode! " ^ (string_of_int e.instruction.opcode))
-  in (e.position + move_by)
+  in execution_fun e
 
 let execute(arr: int array): int array =
   print_string "\n\n-- Starting computer --\n";
