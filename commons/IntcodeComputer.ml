@@ -95,7 +95,7 @@ let read_params(arr: int array) (from: int) (to_i: int): int list =
     match i with
     | _ when i == to_i -> read_p
     | _ -> read (i + 1) ((Array.get arr i)::read_p)
-  in read from []
+  in List.rev (read from [])
 
 let _read_execution_simple (arr: int array) (position: int) : execution =
   let opcode = Array.get arr position in
@@ -115,7 +115,8 @@ let _read_execution_with_modes (arr: int array) (position: int) : execution =
   let operation_str = string_of_int operation in
   let opcode_str = String.sub operation_str (String.length operation_str - 2) (String.length operation_str) in
   let instruction = instruction_of_opcode (int_of_string opcode_str) in
-  let param_modes_str = String.sub operation_str 0 (String.length operation_str - 2) in
+  let param_modes_str_unpadded = String.sub operation_str 0 (String.length operation_str - 2) in
+  let param_modes_str = Basics.pad param_modes_str_unpadded instruction.param_count '0' in
   let params_start_pos = position + 1 in
   let params = read_params arr params_start_pos (params_start_pos + instruction.param_count) in
   let params_modes = List.map (fun c -> int_of_string (Char.escaped c)) (List.of_seq (String.to_seq param_modes_str)) in
@@ -142,13 +143,14 @@ let apply_execution_and_get_next_position(e: execution): int =
   Printf.printf "Executing @ %d with %d and params: [ " e.position e.instruction.opcode;
   List.iter (fun (i1, i2) -> Printf.printf " %d|%d " i1 i2) e.params_and_mode;
   Printf.printf " ]\n";
-  match e.instruction.opcode with
+  let move_by: int = match e.instruction.opcode with
   | 0 -> failwith "Cannot execute a halt!!!"
   | 1 -> execution_add e.array e.params_and_mode
   | 2 -> execution_mul e.array e.params_and_mode
   | 3 -> execution_input e.array e.params_and_mode
   | 4 -> execution_print e.array e.params_and_mode
   | _ -> failwith ("Unknown opcode! " ^ (string_of_int e.instruction.opcode))
+  in (e.position + move_by)
 
 let execute(arr: int array): int array =
   print_string "\n\n-- Starting computer --\n";

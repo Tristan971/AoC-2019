@@ -27,4 +27,13 @@ let combine_arrays (a1: 'a array) (a2: 'b array): ('a * 'b) array =
       print_string "[";
       Array.iteri (fun i e -> if i >= from then print_i i e) arr;
       print_string "]\n"
-  
+
+(* 1 (length of 1) -> 4-length -> [000]1 *)
+let pad (input: string) (length_wanted: int) (pad_character: char): string = 
+  let needed_count = length_wanted - (String.length input) in
+  let rec append (cur: string) (left: int): string =
+    match left with
+    | 0 -> cur
+    | _ -> append ((Char.escaped pad_character) ^ cur) (left -1)
+  in let padding = append "" needed_count in
+  padding ^ input
