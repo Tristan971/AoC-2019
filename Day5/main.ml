@@ -15,6 +15,10 @@ let samples() =
   let _ = exec_with "1101,100,-1,4,0" in
   print_endline "(Samples over!)"
 
+let part1() =
+  let input = IOUtils.read_all_lines "Day5/input"
+  in exec_with (List.hd input)
+
 let () =
-  let _ = samples() in
+  let _ = part1() in
   print_endline "Done"
