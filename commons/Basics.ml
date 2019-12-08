@@ -38,3 +38,8 @@ let pad (input: string) (length_wanted: int) (pad_character: char): string =
     | _ -> append ((Char.escaped pad_character) ^ cur) (left -1)
   in let padding = append "" needed_count in
   padding ^ input
+
+let rec do_x_times (times: int) (call: _ -> unit): unit =
+  match times <= 0 with
+  | true -> print_string ""
+  | false -> call(); do_x_times (times - 1) call
