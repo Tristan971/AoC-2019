@@ -23,13 +23,7 @@ let sample_tree(): v_tree =
     ])
   ])
 
-module AdjacenciesMap = Map.Make(
-  struct
-    type t = string
-
-    let compare = String.compare
-  end
-)
+module AdjacenciesMap = Map.Make(String)
 
 let read_adjacencies(adjacencies: string list) =
   let rec read_adjacencies(left: string list) (map: 'a AdjacenciesMap.t) =
@@ -53,9 +47,12 @@ let print_adjacencies_map(map: string list AdjacenciesMap.t): unit =
 
 let find_root(adjacencies: string list AdjacenciesMap.t): string =
   let is_root (name: string): bool =
+    Printf.printf "Is root %s\n" name;
     let parents = AdjacenciesMap.filter (fun _ children -> not (List.mem name children)) adjacencies
-    in AdjacenciesMap.cardinal parents == 0
-  in let (name, _) = AdjacenciesMap.find_first (fun k -> is_root k) adjacencies in
+    in ((AdjacenciesMap.cardinal parents) == 0)
+  in
+  print_adjacencies_map adjacencies;
+  let (name, _) = AdjacenciesMap.find_first (fun k -> is_root k) adjacencies in
   name
 
 let () =
@@ -64,6 +61,5 @@ let () =
 
   let sample_input = IOUtils.read_all_lines "Day6/input_sample" in
   let sample_adjacencies = read_adjacencies sample_input in
-  print_adjacencies_map sample_adjacencies;
   Printf.printf "Root is %s" (find_root sample_adjacencies);
   print_endline "Done"
