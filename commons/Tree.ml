@@ -1,7 +1,6 @@
 type v_tree =
   | Leaf of string
   | Tree of string * (v_tree list)
-  | TreeRef of string
 
 let print_tree(tree: v_tree): unit =
   let rec printy(tree: v_tree) (depth: int): unit =
@@ -9,5 +8,5 @@ let print_tree(tree: v_tree): unit =
     match tree with
     | Leaf (key) -> Printf.printf "%s ]\n" key
     | Tree (key, trees) -> Printf.printf "%s ->\n" key; List.iter (fun t -> printy t (depth + 1)) trees
-    | TreeRef (key) -> Printf.printf "ref %s\n" key;
   in printy tree 0
+
