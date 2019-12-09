@@ -43,3 +43,17 @@ let rec do_x_times (times: int) (call: _ -> unit): unit =
   match times <= 0 with
   | true -> print_string ""
   | false -> call(); do_x_times (times - 1) call
+
+module StringMap = Map.Make(String)
+
+let group_by (mapping: 'a -> string) (from: 'a list): ('a list StringMap.t) =
+  let empty_opt_to_list_with (opt: 'a list option) (added: 'a) : 'a list option =
+    let res = match opt with
+    | Some a -> added::a
+    | None -> added::[]
+    in Some res
+  in
+  let accumulate(next: 'a) (map: 'a list StringMap.t): 'a list StringMap.t =
+    let key = mapping next in
+    StringMap.update key (fun prev_o -> empty_opt_to_list_with prev_o next) map
+  in List.fold_left (fun sofar next -> accumulate next sofar) StringMap.empty from
