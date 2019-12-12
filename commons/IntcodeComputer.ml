@@ -50,10 +50,9 @@ let execution_mul (e : execution) : execution_result =
 
 let instruction_input : instruction = { opcode = 3; param_count = 1 }
 
-let execution_input (e : execution) : execution_result =
+let execution_input (input : int) (e : execution) : execution_result =
   let _, output = List.hd e.params_and_mode in
   print_string "INPUT REQUEST: ";
-  let input = read_int () in
   e.array.(output) <- input;
   exec_result_of_next_pos (e.position + 2)
 
@@ -192,17 +191,24 @@ let read_execution (arr : int array) (position : int) : execution =
 
 (* entrypoints *)
 
-let apply_execution (e : execution) : execution_result =
+let apply_execution (e : execution) (inputs : int list) :
+    execution_result * int list =
   Printf.printf "Executing opcode %d @ %d with %d and params: [ "
     e.instruction.opcode e.position e.instruction.opcode;
   List.iter (fun (i1, i2) -> Printf.printf " %d|%d " i1 i2) e.params_and_mode;
   Printf.printf " ]\n";
+  let new_inputs : int list =
+    if e.instruction.opcode == instruction_input.opcode then (
+      Printf.printf "Consuming input %d\n" (List.hd inputs);
+      List.tl inputs )
+    else inputs
+  in
   let execution_fun : execution -> execution_result =
     match e.instruction.opcode with
     | 0 -> failwith "Cannot execute a halt!!!"
     | 1 -> execution_add
     | 2 -> execution_mul
-    | 3 -> execution_input
+    | 3 -> execution_input (List.hd inputs)
     | 4 -> execution_print
     | 5 -> execution_jmp_if_true
     | 6 -> execution_jmp_if_false
@@ -210,33 +216,43 @@ let apply_execution (e : execution) : execution_result =
     | 8 -> execution_equals
     | _ -> failwith ("Unknown opcode! " ^ string_of_int e.instruction.opcode)
   in
-  execution_fun e
+  (execution_fun e, new_inputs)
 
-let execute (arr : int array) : int list * int array =
+type intcode_program = { memory : int array; inputs : int list }
+
+let intcode_program_of (memory : string) (inputs : string) : intcode_program =
+  let memory_array = Basics.split_as_ints memory in
+  let inputs_list = List.map int_of_string (String.split_on_char ',' inputs) in
+  { memory = memory_array; inputs = inputs_list }
+
+type intcode_program_result = { memory : int array; outputs : int list }
+
+let execute (program : intcode_program) : intcode_program_result =
   print_string "\n\n-- Starting computer --\n";
   print_string "| Input array: ";
-  Basics.print_int_array arr 0;
+  Basics.print_int_array program.memory 0;
   Printf.printf "-----------------------\n";
 
-  let rec execute_from (position : int) (outputs : int list) : int list * int array =
-    let execution = read_execution arr position in
+  let rec execute_from (position : int) (inputs : int list) (outputs : int list)
+      : int list * int array =
+    let execution = read_execution program.memory position in
     match execution.instruction with
     | instruction when instruction == instruction_halt ->
         Printf.printf "Got HALT @ %d\n" position;
         print_string "Result: ";
-        Basics.print_int_array arr 0;
-        (outputs, arr)
+        Basics.print_int_array program.memory 0;
+        (outputs, program.memory)
     | __ ->
-        let exec_result = apply_execution execution in
+        let exec_result, remaining_inputs = apply_execution execution inputs in
         let new_outputs =
           match exec_result.output with
           | None -> outputs
           | Some new_out -> new_out :: outputs
         in
-        execute_from exec_result.next_position new_outputs
+        execute_from exec_result.next_position remaining_inputs new_outputs
   in
-  let result = execute_from 0 [] in
+  let outputs, memory = execute_from 0 program.inputs [] in
   Printf.printf "-- Finished. --\n\n";
-  result
+  { memory; outputs }
 
 let () = print_endline "Loaded IntCode virtual machine"

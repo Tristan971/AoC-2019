@@ -6,9 +6,8 @@ let split_as_ints(input: string): (int array) =
   Array.of_list input_ints
 
 let exec_with(input: string): (int array) =
-  let input_arr: (int array) = split_as_ints input in
-  let (_, result) = IntcodeComputer.execute input_arr in
-  result
+  let result = IntcodeComputer.execute (IntcodeComputer.intcode_program_of input "") in
+  result.memory
 
 let samples() = 
   (* let _ = exec_with "3,0,4,0,99" in *)
