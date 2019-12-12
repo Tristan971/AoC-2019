@@ -222,7 +222,11 @@ type intcode_program = { memory : int array; inputs : int list }
 
 let intcode_program_of (memory : string) (inputs : string) : intcode_program =
   let memory_array = Basics.split_as_ints memory in
-  let inputs_list = List.map int_of_string (String.split_on_char ',' inputs) in
+  let inputs_list =
+    if String.length inputs > 0 then
+      List.map int_of_string (String.split_on_char ',' inputs)
+    else []
+  in
   { memory = memory_array; inputs = inputs_list }
 
 type intcode_program_result = { memory : int array; outputs : int list }

@@ -5,8 +5,8 @@ let split_as_ints(input: string): (int array) =
   let input_ints = List.map int_of_string input_split in
   Array.of_list input_ints
 
-let exec_with(input: string): (int array) =
-  let result = IntcodeComputer.execute (IntcodeComputer.intcode_program_of input "") in
+let exec_with(program: string) (inputs: string): (int array) =
+  let result = IntcodeComputer.execute (IntcodeComputer.intcode_program_of program inputs) in
   result.memory
 
 let samples() = 
@@ -25,12 +25,12 @@ let samples() =
 let part1() =
   (* input 1 *)
   let input = IOUtils.read_all_lines "Day5/input"
-  in exec_with (List.hd input)
+  in exec_with (List.hd input) "1"
 
 let part2() =
   (* input 5 *)
   let input = IOUtils.read_all_lines "Day5/input"
-  in exec_with (List.hd input)
+  in exec_with (List.hd input) "5"
 
 let () =
   (* let _ = part1() in *)
