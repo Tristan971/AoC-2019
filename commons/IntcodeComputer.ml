@@ -199,7 +199,7 @@ let apply_execution (e : execution) (inputs : int list) :
   Printf.printf " ]\n"; *)
   let new_inputs : int list =
     if e.instruction.opcode == instruction_input.opcode then (
-      Printf.printf "Consuming input %d\n" (List.hd inputs);
+      (* Printf.printf "Consuming input %d\n" (List.hd inputs); *)
       List.tl inputs )
     else inputs
   in
