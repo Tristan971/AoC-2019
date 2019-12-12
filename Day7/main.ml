@@ -65,8 +65,7 @@ let feedback_loop_amplifications (program : string) (phases : int list) =
         IntTbl.replace memories name res;
         feedback ((i + 1) mod nb_phases) h
   in
-  try feedback 0 (initial phases 0)
-  with _ -> 0
+  try feedback 0 (initial phases 0) with _ -> 0
 
 (* let run_sample (program : string) (phases : int list) : unit =
   let result = do_amplification program phases in
@@ -100,13 +99,15 @@ let find_best_phase (input : string) (permutations : int list list)
 
 let part1 () =
   let input = List.hd (IOUtils.read_all_lines "Day7/input") in
-  let phases_permutations = Basics.permutations [ 5; 6; 7; 8; 9 ] in
+  let phases_permutations = Basics.permutations [ 1; 2; 3; 4; 5 ] in
   find_best_phase input phases_permutations do_amplification
 
 let part2 () =
   let _ = List.hd (IOUtils.read_all_lines "Day7/input") in
   let phases_permutations = Basics.permutations [ 5; 6; 7; 8; 9 ] in
-  let inps = "3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5" in
+  let inps =
+    "3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5"
+  in
   find_best_phase inps phases_permutations feedback_loop_amplifications
 
-let () = part2 ()
+let () = part1 ()

@@ -61,7 +61,7 @@ let instruction_print : instruction = { opcode = 4; param_count = 1 }
 let execution_print (e : execution) : execution_result =
   let mi, pi = List.hd e.params_and_mode in
   let input = if mi == 0 then e.array.(pi) else pi in
-  (* Printf.printf "Output => %d\n" input; *)
+  Printf.printf "Output => %d\n" input;
   { next_position = e.position + 2; output = Some input }
 
 let instruction_jmp_if_true : instruction = { opcode = 5; param_count = 2 }
@@ -193,14 +193,14 @@ let read_execution (arr : int array) (position : int) : execution =
 
 let apply_execution (e : execution) (inputs : int list) :
     execution_result * int list =
-  (* Printf.printf "Executing opcode %d @ %d with %d and params: [ "
+  Printf.printf "Executing opcode %d @ %d with %d and params: [ "
     e.instruction.opcode e.position e.instruction.opcode;
   List.iter (fun (i1, i2) -> Printf.printf " %d|%d " i1 i2) e.params_and_mode;
-  Printf.printf " ]\n"; *)
+  Printf.printf " ]\n";
   let new_inputs : int list =
-    if e.instruction.opcode == instruction_input.opcode then (
+    if e.instruction.opcode == instruction_input.opcode then
       (* Printf.printf "Consuming input %d\n" (List.hd inputs); *)
-      List.tl inputs )
+      List.tl inputs
     else inputs
   in
   let execution_fun : execution -> execution_result =
@@ -232,10 +232,10 @@ let intcode_program_of (memory : string) (inputs : string) : intcode_program =
 type intcode_program_result = { memory : int array; outputs : int list }
 
 let execute (program : intcode_program) : intcode_program_result =
-  (* print_string "\n\n-- Start --\n"; *)
-  (* print_string "| Input array: ";
-  Basics.print_int_array program.memory 0;
-  Printf.printf "-----------------------\n"; *)
+  print_string "\n\n-- Start --\n";
+  print_string "| Input array: ";
+  Basics.print_int_array (Array.of_list program.inputs) 0;
+  Printf.printf "-----------------------\n";
   let rec execute_from (position : int) (inputs : int list) (outputs : int list)
       : int list * int array =
     let execution = read_execution program.memory position in
@@ -255,7 +255,10 @@ let execute (program : intcode_program) : intcode_program_result =
         execute_from exec_result.next_position remaining_inputs new_outputs
   in
   let outputs, memory = execute_from 0 program.inputs [] in
-  (* Printf.printf "-- Finished. --\n\n"; *)
+  Printf.printf "-- Finished --\n";
+  Printf.printf "Outputs: ";
+  Basics.print_int_array (Array.of_list outputs) 0;
+  Printf.printf "--------------\n\n";
   { memory; outputs }
 
 let () = print_endline "Loaded IntCode virtual machine"
