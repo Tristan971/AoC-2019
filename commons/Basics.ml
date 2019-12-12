@@ -62,3 +62,16 @@ let split_as_ints(input: string): (int array) =
   let input_split = String.split_on_char ',' input in
   let input_ints = List.map int_of_string input_split in
   Array.of_list input_ints
+
+(* Permutations function by: https://gist.github.com/MassD/fa79de3a5ee88c9c5a8e *)
+let ins_all_positions x l =
+  let rec aux prev acc = function
+    | [] -> (prev @ [x]) :: acc |> List.rev
+    | hd::tl as l -> aux (prev @ [hd]) ((prev @ [x] @ l) :: acc) tl
+  in
+  aux [] [] l
+  
+let rec permutations = function
+  | [] -> []
+  | x::[] -> [[x]] (* we must specify this edge case *)
+  | x::xs -> List.fold_left (fun acc p -> acc @ ins_all_positions x p ) [] (permutations xs)
