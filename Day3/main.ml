@@ -81,11 +81,11 @@ let get_intersection_time (intersection : pos) (positions : pos list) : int =
   let rec get_time (positions_left : pos list) (sofar : int) =
     match positions_left with
     | [] -> failwith "Position not found?"
-    | h :: _ when (h.x = intersection.x && h.y = intersection.y) -> sofar
+    | h :: _ when h.x = intersection.x && h.y = intersection.y -> sofar
     | _ :: t -> get_time t (sofar + 1)
   in
   let reverse_time = get_time positions 0 in
-  (List.length positions) - reverse_time
+  List.length positions - reverse_time
 
 let quickest_intersection (intersections : pos list) (w1 : pos list)
     (w2 : pos list) : unit =
@@ -99,7 +99,11 @@ let quickest_intersection (intersections : pos list) (w1 : pos list)
     List.sort (fun a b -> Int.compare a.time b.time) timed_intersections
   in
   let quickest = List.hd sorted_intersections in
-  print_endline("Quickest intersection was: " ^ string_of_pos quickest.position ^ " with full time: " ^ string_of_int quickest.time) 
+  print_endline
+    ( "Quickest intersection was: "
+    ^ string_of_pos quickest.position
+    ^ " with full time: "
+    ^ string_of_int quickest.time )
 
 let get_closest_intersection (intersections : pos list) : unit =
   let compare_by_manhattan_distance (pos1 : pos) (pos2 : pos) =
@@ -107,7 +111,10 @@ let get_closest_intersection (intersections : pos list) : unit =
   in
   let sorted = List.sort compare_by_manhattan_distance intersections in
   let closest = get_manhattan_distance (List.hd sorted) in
-  print_endline ( "Closest intersection is " ^ string_of_pos (List.hd sorted) ^ " with distance " ^ string_of_int closest)
+  print_endline
+    ( "Closest intersection is "
+    ^ string_of_pos (List.hd sorted)
+    ^ " with distance " ^ string_of_int closest )
 
 let parse_path (path_str : string) : path =
   let direction = String.sub path_str 0 1 in
@@ -126,7 +133,8 @@ let find_intersections (wire1 : path list) (wire2 : path list) : unit =
     ("Wire 2 had: " ^ string_of_int (List.length pos2) ^ " positions.");
 
   let intersections = get_intersections pos1 pos2 in
-  print_endline("Intersections count: " ^ string_of_int (List.length intersections));
+  print_endline
+    ("Intersections count: " ^ string_of_int (List.length intersections));
 
   get_closest_intersection intersections;
   quickest_intersection intersections pos1 pos2;
@@ -154,6 +162,6 @@ let samples () : unit =
       "U98,R91,D20,R16,D67,R40,U7,R15,U6,R7";
     ]
 
-let () = 
+let () =
   let input = IOUtils.read_all_lines "./Day3/input" in
   run_for input

@@ -198,9 +198,9 @@ let apply_execution (e : execution) (inputs : int list) :
   List.iter (fun (i1, i2) -> Printf.printf " %d|%d " i1 i2) e.params_and_mode;
   Printf.printf " ]\n"; *)
   let new_inputs : int list =
-    if e.instruction.opcode == instruction_input.opcode then (
+    if e.instruction.opcode == instruction_input.opcode then
       (* Printf.printf "Consuming input %d\n" (List.hd inputs); *)
-      List.tl inputs )
+      List.tl inputs
     else inputs
   in
   let execution_fun : execution -> execution_result =
@@ -236,7 +236,6 @@ let execute (program : intcode_program) : intcode_program_result =
   (* print_string "| Input array: ";
   Basics.print_int_array program.memory 0;
   Printf.printf "-----------------------\n"; *)
-
   let rec execute_from (position : int) (inputs : int list) (outputs : int list)
       : int list * int array =
     let execution = read_execution program.memory position in
