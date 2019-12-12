@@ -57,3 +57,8 @@ let group_by (mapping: 'a -> string) (from: 'a list): ('a list StringMap.t) =
     let key = mapping next in
     StringMap.update key (fun prev_o -> empty_opt_to_list_with prev_o next) map
   in List.fold_left (fun sofar next -> accumulate next sofar) StringMap.empty from
+
+let split_as_ints(input: string): (int array) =
+  let input_split = String.split_on_char ',' input in
+  let input_ints = List.map int_of_string input_split in
+  Array.of_list input_ints

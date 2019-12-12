@@ -12,7 +12,7 @@ let split_as_ints(input: string): (int array) =
   Array.of_list input_ints
 
 let exec_for(input: string) =
-  let result = IntcodeComputer.execute (split_as_ints input) in
+  let (_, result) = IntcodeComputer.execute (split_as_ints input) in
   Array.to_list result
 
 let samples(): unit = 
@@ -27,7 +27,8 @@ let exec_with(input: string)(params: noun_verb): (int array) =
   let input_arr: (int array) = split_as_ints input in
   Array.set input_arr 1 params.noun;
   Array.set input_arr 2 params.verb;
-  Commons.IntcodeComputer.execute input_arr
+  let (_, result) = Commons.IntcodeComputer.execute input_arr in
+  result
 
 let read_input(): string = 
   let input = IOUtils.read_all_lines "./Day2/input" in

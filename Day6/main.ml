@@ -34,8 +34,8 @@ let string_to_orbit(in_s: string): orbit =
   let parts = String.split_on_char ')' in_s in
   { center=List.hd parts; orbiter=List.nth parts 1 }
 
-let parse_and_merge_trees(orbits: orbit list): v_tree =
-  let orbiters_by_key = group_by (fun orbit -> orbit.center) orbits in
+let parse_and_merge_trees(orbits: orbit list) =
+  let _ = group_by (fun orbit -> orbit.center) orbits in
+  print_endline "Incomplete"
 
-let () =
-  print_endline "Done"
+let () = print_endline "Done"
