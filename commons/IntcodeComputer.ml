@@ -61,7 +61,7 @@ let instruction_print : instruction = { opcode = 4; param_count = 1 }
 let execution_print (e : execution) : execution_result =
   let mi, pi = List.hd e.params_and_mode in
   let input = if mi == 0 then e.array.(pi) else pi in
-  Printf.printf "Output => %d\n" input;
+  (* Printf.printf "Output => %d\n" input; *)
   { next_position = e.position + 2; output = Some input }
 
 let instruction_jmp_if_true : instruction = { opcode = 5; param_count = 2 }
@@ -199,7 +199,7 @@ let apply_execution (e : execution) (inputs : int list) :
   Printf.printf " ]\n"; *)
   let new_inputs : int list =
     if e.instruction.opcode == instruction_input.opcode then (
-      Printf.printf "Consuming input %d\n" (List.hd inputs);
+      (* Printf.printf "Consuming input %d\n" (List.hd inputs); *)
       List.tl inputs )
     else inputs
   in
@@ -232,7 +232,7 @@ let intcode_program_of (memory : string) (inputs : string) : intcode_program =
 type intcode_program_result = { memory : int array; outputs : int list }
 
 let execute (program : intcode_program) : intcode_program_result =
-  print_string "\n\n-- Start --\n";
+  (* print_string "\n\n-- Start --\n"; *)
   (* print_string "| Input array: ";
   Basics.print_int_array program.memory 0;
   Printf.printf "-----------------------\n"; *)
@@ -242,7 +242,7 @@ let execute (program : intcode_program) : intcode_program_result =
     let execution = read_execution program.memory position in
     match execution.instruction with
     | instruction when instruction == instruction_halt ->
-        Printf.printf "Got HALT @ %d\n-- Done --\n\n" position;
+        (* Printf.printf "Got HALT @ %d\n-- Done --\n\n" position; *)
         (* print_string "Result: "; *)
         (* Basics.print_int_array program.memory 0; *)
         (outputs, program.memory)
