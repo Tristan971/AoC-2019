@@ -4,21 +4,37 @@ open Commons.IntcodeComputer
 
 let input : string list = IOUtils.read_all_lines "Day7/input"
 
-let exec_program (program : string) (inputs : int list) : int =
+let exec_program (program : string) (inputs : int list) : int list * int array =
   let memory = split_as_ints program in
   let intcode_program : intcode_program = { memory; inputs } in
   let result = IntcodeComputer.execute intcode_program in
-  List.hd result.outputs
+  (result.outputs, result.memory)
 
 let do_amplification (program : string) (phases : int list) : int =
   let rec amplify (phases : int list) (previous : int) =
     match phases with
     | [] -> previous
     | phase :: remaining_phases ->
-        let result = exec_program program [ phase; previous ] in
-        amplify remaining_phases result
+        let result, _ = exec_program program [ phase; previous ] in
+        amplify remaining_phases (List.hd result)
   in
   amplify phases 0
+
+let amplify_then_feed_amplifications (program : string) (phases: int list) : int =
+  let rec initial_amplification (memory: int array) (phases : int list) (previous : int) =
+    match phases with
+    | [] -> previous, memory
+    | phase :: remaining_phases ->
+        let outputs, memory = exec_program program [ phase; previous ] in
+        initial_amplification memory remaining_phases (List.hd outputs)
+  in
+  let (feed_signal_0, feed_memory_0) = initial_amplification (split_as_ints program) phases 0 in
+
+  let rec feed_amplify (memory : int array) (signal : int) =
+    let result = IntcodeComputer.execute { memory; inputs = [ signal ] } in
+    match result.outputs with [] -> signal | h :: _ -> feed_amplify result.memory h
+  in
+  feed_amplify feed_memory_0 feed_signal_0
 
 (* let run_sample (program : string) (phases : int list) : unit =
   let result = do_amplification program phases in
@@ -35,38 +51,31 @@ let samples () =
     [ 1; 0; 4; 3; 2 ];
   print_endline "Samples over" *)
 
+type phase_application = string -> int list -> int
+
+let find_best_phase (input: string) (phases_permutations: int list list) (tarace: phase_application) =
+  let phases_and_signal =
+    List.map
+      (fun phases -> (phases, tarace input phases))
+      phases_permutations
+  in
+  let by_amp_level =
+    List.sort (fun (_, s1) (_, s2) -> Int.compare s1 s2) phases_and_signal
+  in
+  let phases, signal = List.hd (List.rev by_amp_level) in
+  Printf.printf "Found best amplification signal to be %d with permutation: "
+    signal;
+  print_int_array (Array.of_list phases) 0;
+  print_endline "Done"
+
 let part1 () =
   let input = List.hd (IOUtils.read_all_lines "Day7/input") in
   let phases_permutations = Basics.permutations [ 0; 1; 2; 3; 4 ] in
-  let phases_and_signal =
-    List.map
-      (fun phases -> (phases, do_amplification input phases))
-      phases_permutations
-  in
-  let by_amp_level =
-    List.sort (fun (_, s1) (_, s2) -> Int.compare s1 s2) phases_and_signal
-  in
-  let phases, signal = List.hd (List.rev by_amp_level) in
-  Printf.printf "Found best amplification signal to be %d with permutation: "
-    signal;
-  print_int_array (Array.of_list phases) 0;
-  print_endline "Done"
+  find_best_phase input phases_permutations do_amplification
 
 let part2 () =
   let input = List.hd (IOUtils.read_all_lines "Day7/input") in
-  let phases_permutations = Basics.permutations [ 0; 1; 2; 3; 4 ] in
-  let phases_and_signal =
-    List.map
-      (fun phases -> (phases, do_amplification input phases))
-      phases_permutations
-  in
-  let by_amp_level =
-    List.sort (fun (_, s1) (_, s2) -> Int.compare s1 s2) phases_and_signal
-  in
-  let phases, signal = List.hd (List.rev by_amp_level) in
-  Printf.printf "Found best amplification signal to be %d with permutation: "
-    signal;
-  print_int_array (Array.of_list phases) 0;
-  print_endline "Done"
+  let phases_permutations = Basics.permutations [ 5; 6; 7; 8; 9 ] in
+  find_best_phase input phases_permutations amplify_then_feed_amplifications
 
-let () = part1 ()
+let () = part2 ()

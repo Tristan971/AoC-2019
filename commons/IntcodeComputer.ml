@@ -198,9 +198,9 @@ let apply_execution (e : execution) (inputs : int list) :
   List.iter (fun (i1, i2) -> Printf.printf " %d|%d " i1 i2) e.params_and_mode;
   Printf.printf " ]\n"; *)
   let new_inputs : int list =
-    if e.instruction.opcode == instruction_input.opcode then
-      (* Printf.printf "Consuming input %d\n" (List.hd inputs); *)
-      List.tl inputs
+    if e.instruction.opcode == instruction_input.opcode then (
+      Printf.printf "Consuming input %d\n" (List.hd inputs);
+      List.tl inputs )
     else inputs
   in
   let execution_fun : execution -> execution_result =
